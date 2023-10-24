@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+
+        <style>
+            #bg-color{
+                background-color: blue;
+                text-align: center;
+            }
+            #task{
+                width: 30%;
+                height: 40px;
+                border-radius: 5px;
+                margin-top: 2%;
+                text-align: center;
+                cursor: pointer;
+                font-weight: bolder;
+                color: black;
+            }
+            #task:hover{
+                border: 3px dotted black;
+                font-size: 14px;
+            }
+            .details{
+                color: black;
+                font-weight: bold;
+                font-size: 18px;
+                margin-bottom: 2%;
+                border: 2px solid black;
+                width: 25%;
+                background-color: white;
+                padding: 8px 0px;
+                margin: auto;
+                margin-top: 2%;
+                margin-bottom: 4px;
+                border-radius: 5px;
+            }
+            .options button{
+                padding: 8px 76px ;
+                cursor: pointer;
+                font-weight: bolder;
+                border-radius: 5px;
+            }
+            .options button:hover{
+                border: 3px solid black;
+                font-size: 15px;
+            }
+            #items{
+                text-align: center;
+            }
+        </style>
+
+
+<body id="bg-color">
+    <div class="input-btn">
+        <input type="text" id="task" onchange="addTask()" placeholder="Type Somthing">
+    </div>
+    <div id="tasks">
+        <div id="items">
+            
+        </div>
+    </div>
+
+
+
+
+    <script>
+        let data=document.getElementById("task");
+        function addTask(){
+            let task=data.value;
+
+
+            fetch("http://localhost:3001/api/addtask",{
+                method:"POST",
+                headers:{"content-type":"application/json"},
+                body:JSON.stringify({task})
+            }).then(()=>{
+                alert("Task Added SuccessFully");
+            }).catch("error")
+            getTodo();
+            data.value=""
+        }
+
+            async function getTodo(){
+                const task=await fetch("http://localhost:3001/api/gettask");
+                const data=await task.json();
+                s=""
+                data.map(dt=>{
+                    s+=`
+           <div class="details">
+                ${dt.task}
+            </div>
+            <div class="options">
+                <button onclick="show('${dt._id}')">Edit</button>
+                <button onclick="delTodo('${dt._id}')">Delete</button>
+            </div>`
+                });
+                
+                document.getElementById("items").innerHTML=s
+            }
+
+                getTodo();
+                function show(id){
+                    value=id
+                    // alert(value)
+                }
+
+                function delTodo(id)
+                {
+                    fetch(`http://localhost:3001/api/deltask/${id}`,{
+                        method:"DELETE",
+                    }).then((data)=>{
+                        if(data.status==200)
+                        {
+                            alert("Data Deleted SuccessFully")
+                        }
+                        else
+                        {
+                            alert("error")
+                        }
+                        getTodo();
+                    }).catch((error)=>{
+                        console.log(error);
+                    })
+                }
+    </script>
+</body>
+</html>
